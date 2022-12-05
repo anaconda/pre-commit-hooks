@@ -6,17 +6,24 @@
 // subprocess.
 
 import {spawn} from 'child_process';
+import { exit } from 'process';
 
 
 // The first two arguments are node and then mjml_hook
-const templates = process.argv.slice(2);
+const args = process.argv.slice(2);
+
+const templates = args.filter(x => x.endsWith(".mjml"))
+const options = args.filter(x => !x.endsWith(".mjml"))
+console.log("templates:", templates)
+console.log("options:", options)
 
 for (const template of templates) {
   const output = template.replace('.mjml', '.html');
   console.log('Rendering', template, '->', output);
 
   // https://stackoverflow.com/a/16099450
-  const prc = spawn('mjml', ['-o', output, template]);
+  const prc = spawn('mjml', ['-o', output, ...options, template]);
+  console.log("command args:", ['-o', output, ...options, template])
 
   // Capture stdout
   let lines = [];
@@ -34,3 +41,4 @@ for (const template of templates) {
     }
   });
 }
+exit(1);
