@@ -6,3 +6,9 @@
     additional_dependencies: ["mjml@4.12.0"]
     minimum_pre_commit_version: '0'
     files: .*\.mjml
+-   id: run-cog
+    name: run cog to generate code
+    entry: run-cog
+    args: ["--working-directory-level", "-1"]
+    language: python
+    types: [text]
