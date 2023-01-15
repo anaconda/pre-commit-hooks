@@ -19,7 +19,7 @@ This is particularly useful if the `cog` script itself uses `subprocess` to exec
     -   id: run-cog
         args: ["--working-directory-level", "-1"]
 ```
-## mjml-hook 
+## mjml-hook
 
 A simple wrapper around the [`mjml`](https://github.com/mjmlio/mjml) tool to use as a [`pre-commit`](https://pre-commit.com) hook.
 
