@@ -38,7 +38,7 @@ def run_cog(
             elements = path_str.split("/")
             cwd = Path(*elements[:working_directory_level])
 
-        result = subprocess.run(["cog", "-r", file_path.name], cwd=str(cwd))
+        result = subprocess.run(["cog", "-r", file_path.resolve().as_posix()], cwd=str(cwd))
         if result.returncode != 0:
             return result.returncode
 
