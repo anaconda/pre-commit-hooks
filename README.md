@@ -6,7 +6,7 @@ This repo contains custom `pre-commit` hooks.
 
 ## run-cog
 
-The `run-cog` hook can be used to run the [`cog`]() tool automatically to generate code when committing a file.
+The `run-cog` hook can be used to run the [`cog`](https://nedbatchelder.com/code/cog) tool automatically to generate code when committing a file.
 One common example is to generate command-line output in a README file.
 
 The example below will run `cog` on all text-like files, ensuring the working directory is set to the directory in which the file is located.
