@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "anaconda_pre_commit_hooks"
+version = "0.1.0"
+description = "Python pre-commit hooks from Anaconda"
+authors = [
+    {name = "Matt Kramer", email = "mkramer@anaconda.com"},
+]
+license = {text = "Apache-2.0"}
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = ["cogapp<=3.3"]
+
+[project.optional-dependencies]
+dev = []
+
+[project.scripts]
+run-cog = "anaconda_pre_commit_hooks.run_cog:main"

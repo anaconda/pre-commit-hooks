@@ -1,0 +1,5 @@
+# Package build outputs
+*.egg-info
+
+# Virtual environments
+.venv/
