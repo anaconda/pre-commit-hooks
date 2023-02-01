@@ -11,4 +11,3 @@
     entry: run-cog
     args: ["--working-directory-level", "-1"]
     language: python
-    types: [text]
