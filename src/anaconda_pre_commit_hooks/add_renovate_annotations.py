@@ -16,9 +16,6 @@ from pathlib import Path
 from typing import NamedTuple, Optional, TypedDict
 import typer
 
-# conda packages will come from `main`, unless in this mapping of package: channel
-CHANNEL_OVERRIDES = {}
-
 INTERNAL_PYPI_PACKAGES = {}
 INTERNAL_PYPI_INDEX = ""
 
@@ -91,9 +88,10 @@ def load_dependencies(project_directory: Path) -> Dependencies:
 def process_environment_file(
     env_file: Path,
     dependencies: Dependencies,
-    channel_overrides: ChannelOverrides,
+    conda_channel_overrides: Optional[ChannelOverrides] = None,
 ):
     """Process an environment file, which entails adding renovate comments and pinning the installed version."""
+    conda_channel_overrides = conda_channel_overrides or {}
     with env_file.open() as fp:
         in_lines = fp.readlines()
 
@@ -136,8 +134,8 @@ def process_environment_file(
                 datasource, dep_name = "pypi", package_name
             else:
                 channel_name = "main"
-                if package_name in channel_overrides:
-                    channel_name = channel_overrides[package_name]
+                if package_name in conda_channel_overrides:
+                    channel_name = conda_channel_overrides[package_name]
                 elif matching_dependency:
                     channel_name = matching_dependency["channel"]
                 datasource, dep_name = "conda", f"{channel_name}/{package_name}"
@@ -177,11 +175,11 @@ def process_environment_file(
 def add_comments_to_env_files(
     env_files: list[Path],
     dependencies: Dependencies,
-    channel_overrides: ChannelOverrides,
+    conda_channel_overrides: Optional[ChannelOverrides] = None,
 ) -> None:
     """Process each environment file found."""
     for f in env_files:
-        process_environment_file(f, dependencies, channel_overrides)
+        process_environment_file(f, dependencies, conda_channel_overrides=conda_channel_overrides)
 
 
 def cli(env_files: list[Path]) -> None:
@@ -193,7 +191,7 @@ def cli(env_files: list[Path]) -> None:
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)
         project_env_files = [e for e in env_files if e.parent == project_dir]
-        add_comments_to_env_files(project_env_files, deps, CHANNEL_OVERRIDES)
+        add_comments_to_env_files(project_env_files, deps)
 
 
 def main() -> None:
