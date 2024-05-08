@@ -13,3 +13,8 @@ repos:
         additional_dependencies:
         -   eslint@>=5.16.0
         -   eslint-config-google@latest
+-   repo: https://github.com/asottile/pyupgrade
+    rev: v3.15.2
+    hooks:
+    -   id: pyupgrade
+        args: [--py38-plus]
