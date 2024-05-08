@@ -12,9 +12,9 @@ import json
 import os
 import re
 import subprocess
-import sys
 from pathlib import Path
 from typing import NamedTuple, Optional, TypedDict
+import typer
 
 # conda packages will come from `main`, unless in this mapping of package: channel
 CHANNEL_OVERRIDES = {}
@@ -184,9 +184,7 @@ def add_comments_to_env_files(
         process_environment_file(f, dependencies, channel_overrides)
 
 
-def main(args: Optional[list[str]] = None) -> None:
-    args = args or sys.argv[1:]
-    env_files = [Path(p) for p in args]
+def cli(env_files: list[Path]) -> None:
 
     # Group into a list of parent directories. This prevents us from running
     # `make setup` for each file, and only once per project.
@@ -196,6 +194,10 @@ def main(args: Optional[list[str]] = None) -> None:
         deps = load_dependencies(project_dir)
         project_env_files = [e for e in env_files if e.parent == project_dir]
         add_comments_to_env_files(project_env_files, deps, CHANNEL_OVERRIDES)
+
+
+def main() -> None:
+    typer.run(cli)
 
 
 if __name__ == "__main__":
