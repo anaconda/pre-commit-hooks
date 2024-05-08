@@ -14,7 +14,7 @@ import re
 import subprocess
 import sys
 from pathlib import Path
-from typing import Dict, NamedTuple, Optional, TypedDict, List
+from typing import NamedTuple, Optional, TypedDict
 
 # conda packages will come from `main`, unless in this mapping of package: channel
 CHANNEL_OVERRIDES = {}
@@ -26,7 +26,7 @@ CondaOrPip = str
 PackageName = str
 PackageVersion = str
 ChannelName = str
-ChannelOverrides = Dict[PackageName, ChannelName]
+ChannelOverrides = dict[PackageName, ChannelName]
 
 
 class Dependency(TypedDict):
@@ -36,8 +36,8 @@ class Dependency(TypedDict):
 
 
 class Dependencies(NamedTuple):
-    pip: Dict[str, Dependency]
-    conda: Dict[str, Dependency]
+    pip: dict[str, Dependency]
+    conda: dict[str, Dependency]
 
 
 @contextlib.contextmanager
@@ -184,7 +184,7 @@ def add_comments_to_env_files(
         process_environment_file(f, dependencies, channel_overrides)
 
 
-def main(args: Optional[List[str]] = None) -> None:
+def main(args: Optional[list[str]] = None) -> None:
     args = args or sys.argv[1:]
     env_files = [Path(p) for p in args]
 
