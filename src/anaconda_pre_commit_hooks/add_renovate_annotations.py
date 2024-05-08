@@ -88,6 +88,7 @@ def load_dependencies(project_directory: Path) -> Dependencies:
 def process_environment_file(
     env_file: Path,
     dependencies: Dependencies,
+    *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
 ):
     """Process an environment file, which entails adding renovate comments and pinning the installed version."""
@@ -175,6 +176,7 @@ def process_environment_file(
 def add_comments_to_env_files(
     env_files: list[Path],
     dependencies: Dependencies,
+    *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
 ) -> None:
     """Process each environment file found."""
