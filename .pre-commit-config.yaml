@@ -1,20 +1,37 @@
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-json
-    -   id: check-yaml
--   repo: https://github.com/pre-commit/mirrors-eslint
-    rev: 'v8.56.0'
-    hooks:
-    -   id: eslint
-        additional_dependencies:
-        -   eslint@>=5.16.0
-        -   eslint-config-google@latest
--   repo: https://github.com/asottile/pyupgrade
-    rev: v3.15.2
-    hooks:
-    -   id: pyupgrade
-        args: [--py38-plus]
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.6.0
+  hooks:
+  - id: trailing-whitespace
+  - id: end-of-file-fixer
+  - id: check-json
+  - id: check-yaml
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.13.0
+  hooks:
+  - id: pretty-format-toml
+    args: [--autofix]
+  - id: pretty-format-yaml
+    args: [--autofix]
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.4.3
+  hooks:
+    # lint & attempt to correct failures
+  - id: ruff
+    args: [--fix, --show-fixes]
+- repo: https://github.com/pre-commit/mirrors-eslint
+  rev: v8.56.0
+  hooks:
+  - id: eslint
+    additional_dependencies:
+    - eslint@>=5.16.0
+    - eslint-config-google@latest
+- repo: https://github.com/asottile/pyupgrade
+  rev: v3.15.2
+  hooks:
+  - id: pyupgrade
+    args: [--py39-plus]
+- repo: meta
+  hooks:
+  - id: check-hooks-apply
+  - id: check-useless-excludes
