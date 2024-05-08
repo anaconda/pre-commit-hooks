@@ -190,7 +190,7 @@ def main(args: Optional[List[str]] = None) -> None:
 
     # Group into a list of parent directories. This prevents us from running
     # `make setup` for each file, and only once per project.
-    project_dirs = sorted(set(env_file.parent for env_file in env_files))
+    project_dirs = sorted({env_file.parent for env_file in env_files})
 
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)

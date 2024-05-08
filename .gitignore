@@ -1,5 +1,6 @@
 # Package build outputs
 *.egg-info
+__pycache__/
 
 # Virtual environments
 .venv/
