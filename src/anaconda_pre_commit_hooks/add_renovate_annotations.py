@@ -13,17 +13,16 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import NamedTuple, Optional, TypedDict
+from typing import NamedTuple, Optional, TypedDict, Annotated
 import typer
-
-INTERNAL_PYPI_PACKAGES = {}
-INTERNAL_PYPI_INDEX = ""
 
 CondaOrPip = str
 PackageName = str
 PackageVersion = str
 ChannelName = str
+IndexUrl = str
 ChannelOverrides = dict[PackageName, ChannelName]
+IndexOverrides = dict[PackageName, IndexUrl]
 
 
 class Dependency(TypedDict):
@@ -90,9 +89,12 @@ def process_environment_file(
     dependencies: Dependencies,
     *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
+    pypi_index_overrides: Optional[IndexOverrides] = None,
 ):
     """Process an environment file, which entails adding renovate comments and pinning the installed version."""
     conda_channel_overrides = conda_channel_overrides or {}
+    pypi_index_overrides = pypi_index_overrides or {}
+
     with env_file.open() as fp:
         in_lines = fp.readlines()
 
@@ -147,8 +149,8 @@ def process_environment_file(
             if package_name != ".":
                 if datasource == "conda":
                     renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} depName={dep_name}\n"
-                elif dep_name in INTERNAL_PYPI_PACKAGES:
-                    renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} registryUrl={INTERNAL_PYPI_INDEX}\n"
+                elif (index_url := pypi_index_overrides.get(dep_name)) is not None:
+                    renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} registryUrl={index_url}\n"
                 else:
                     renovate_line = (
                         f"{' ' * indentation}# renovate: datasource={datasource}\n"
@@ -178,22 +180,32 @@ def add_comments_to_env_files(
     dependencies: Dependencies,
     *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
+    pypi_index_overrides: Optional[IndexOverrides] = None,
 ) -> None:
     """Process each environment file found."""
     for f in env_files:
-        process_environment_file(f, dependencies, conda_channel_overrides=conda_channel_overrides)
+        process_environment_file(f, dependencies, conda_channel_overrides=conda_channel_overrides, pypi_index_overrides=pypi_index_overrides)
 
 
-def cli(env_files: list[Path]) -> None:
+def cli(
+    env_files: list[Path],
+    internal_pip_package: Annotated[Optional[list[str]], typer.Option()] = None,
+    internal_pip_index_url: Annotated[str, typer.Option()] = "",
+) -> None:
 
     # Group into a list of parent directories. This prevents us from running
     # `make setup` for each file, and only once per project.
     project_dirs = sorted({env_file.parent for env_file in env_files})
 
+    pip_index_overrides = {}
+    if internal_pip_index_url and internal_pip_package:
+        for pkg_name in internal_pip_package:
+            pip_index_overrides[pkg_name] = internal_pip_index_url
+
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)
         project_env_files = [e for e in env_files if e.parent == project_dir]
-        add_comments_to_env_files(project_env_files, deps)
+        add_comments_to_env_files(project_env_files, deps, pypi_index_overrides=pip_index_overrides)
 
 
 def main() -> None:
