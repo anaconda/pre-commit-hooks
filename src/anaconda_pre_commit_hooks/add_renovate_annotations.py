@@ -3,7 +3,7 @@
 
 Given a number of paths specified as CLI arguments, we extract the unique app directories
 and then add comments to all environment files in those directories. This prevents running
-the environment update for each file. In generall, pre-commit will pass this file list in
+the environment update for each file. In general, pre-commit will pass this file list in
 based on its own include rules specified in .pre-commit-config.yaml.
 
 """
