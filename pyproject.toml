@@ -6,7 +6,10 @@ requires = ["setuptools", "setuptools-scm"]
 authors = [
   {name = "Matt Kramer", email = "mkramer@anaconda.com"}
 ]
-dependencies = ["cogapp<=3.3"]
+dependencies = [
+  "cogapp<=3.3",
+  "typer<0.13"
+]
 description = "Python pre-commit hooks from Anaconda"
 license = {text = "Apache-2.0"}
 name = "anaconda_pre_commit_hooks"
@@ -18,7 +21,11 @@ version = "0.1.0"
 dev = []
 
 [project.scripts]
+generate-renovate-annotations = "anaconda_pre_commit_hooks.add_renovate_annotations:main"
 run-cog = "anaconda_pre_commit_hooks.run_cog:main"
 
 [tool.ruff]
 target-version = "py39"
+
+[tool.ruff.lint]
+extend-select = ["I"]
