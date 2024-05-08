@@ -19,7 +19,7 @@ An example usage is shown below:
 
 ```yaml
 - repo: https://github.com/anaconda/pre-commit-hooks
-  rev: main
+  rev: main  # Use the ref you want to point at
   hooks:
     - id: generate-renovate-annotations
       args: [
