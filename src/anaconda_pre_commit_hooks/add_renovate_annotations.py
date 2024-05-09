@@ -219,7 +219,7 @@ def add_comments_to_env_files(
         )
 
 
-def _parse_pip_index_overrides(
+def parse_pip_index_overrides(
     internal_pip_index_url: str, internal_pip_package: list[str]
 ) -> dict[PackageName, IndexUrl]:
     pip_index_overrides = {}
@@ -235,7 +235,7 @@ def cli(
     internal_pip_index_url: Annotated[str, typer.Option()] = "",
 ) -> None:
     # Construct a mapping of package name to index URL based on CLI options
-    pip_index_overrides = _parse_pip_index_overrides(
+    pip_index_overrides = parse_pip_index_overrides(
         internal_pip_index_url, internal_pip_package or []
     )
 
