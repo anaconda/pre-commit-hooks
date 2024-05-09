@@ -38,7 +38,9 @@ def run_cog(
             elements = path_str.split("/")
             cwd = Path(*elements[:working_directory_level])
 
-        result = subprocess.run(["cog", "-r", file_path.resolve().as_posix()], cwd=str(cwd))
+        result = subprocess.run(
+            ["cog", "-r", file_path.resolve().as_posix()], cwd=str(cwd)
+        )
         if result.returncode != 0:
             return result.returncode
 
@@ -48,14 +50,15 @@ def run_cog(
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        'filenames', nargs='*',
-        help='Filenames pre-commit believes are changed.',
+        "filenames",
+        nargs="*",
+        help="Filenames pre-commit believes are changed.",
     )
     parser.add_argument(
-        '--working-directory-level',
+        "--working-directory-level",
         default=0,
         type=int,
-        help="The number of levels from the repo root to traverse into when setting cog's working directory."
+        help="The number of levels from the repo root to traverse into when setting cog's working directory.",
     )
     args = parser.parse_args(argv)
 
@@ -65,5 +68,5 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())
