@@ -108,7 +108,7 @@ def load_dependencies(
     return Dependencies(pip=pip_deps, conda=conda_deps)
 
 
-def process_environment_file(
+def add_comments_to_env_file(
     env_file: Path,
     dependencies: Dependencies,
     *,
@@ -199,23 +199,6 @@ def process_environment_file(
         fp.writelines(out_lines)
 
 
-def add_comments_to_env_files(
-    env_files: list[Path],
-    dependencies: Dependencies,
-    *,
-    conda_channel_overrides: Optional[ChannelOverrides] = None,
-    pypi_index_overrides: Optional[IndexOverrides] = None,
-) -> None:
-    """Process each environment file found."""
-    for f in env_files:
-        process_environment_file(
-            f,
-            dependencies,
-            conda_channel_overrides=conda_channel_overrides,
-            pypi_index_overrides=pypi_index_overrides,
-        )
-
-
 def parse_pip_index_overrides(
     internal_pip_index_url: str, internal_pip_package: list[str]
 ) -> dict[PackageName, IndexUrl]:
@@ -241,10 +224,13 @@ def cli(
     project_dirs = sorted({env_file.parent for env_file in env_files})
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)
-        project_env_files = [e for e in env_files if e.parent == project_dir]
-        add_comments_to_env_files(
-            project_env_files, deps, pypi_index_overrides=pip_index_overrides
-        )
+        project_env_files = (e for e in env_files if e.parent == project_dir)
+        for env_file in project_env_files:
+            add_comments_to_env_file(
+                env_file,
+                deps,
+                pypi_index_overrides=pip_index_overrides,
+            )
 
 
 def main() -> None:
