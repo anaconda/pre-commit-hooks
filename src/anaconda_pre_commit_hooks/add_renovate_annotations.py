@@ -12,6 +12,7 @@ import contextlib
 import json
 import os
 import re
+import shlex
 import subprocess
 from pathlib import Path
 from typing import Annotated, NamedTuple, Optional, TypedDict
@@ -46,23 +47,35 @@ def working_dir(d: Path):
     os.chdir(orig)
 
 
-def load_dependencies(project_directory: Path) -> Dependencies:
+def load_dependencies(
+    project_directory: Path,
+    create_command: str = "make setup",
+    environment_selector: str = "-p ./env",
+) -> Dependencies:
     with working_dir(project_directory):
         # First ensure the conda environment exists
-        result = subprocess.run(["make", "setup"], capture_output=True, text=True)
+        result = subprocess.run(
+            shlex.split(create_command), capture_output=True, text=True
+        )
         if result.returncode != 0:
             print(f"Failed to run make setup for {project_directory}")
             print(result.stdout)
             print(result.stderr)
             result.check_returncode()
+
+        # Then we list the actual versions of each package in the environment
         result = subprocess.run(
-            ["conda", "list", "-p", "./env", "--json"], capture_output=True, text=True
+            ["conda", "list", *shlex.split(environment_selector), "--json"],
+            capture_output=True,
+            text=True,
         )
         if result.returncode != 0:
             print(result.stdout)
             print(result.stderr)
             result.check_returncode()
         data = json.loads(result.stdout)
+
+        # We split the list separately into pip & conda dependencies
         pip_deps = {
             x["name"]: Dependency(
                 name=x["name"], channel=x["channel"], version=x["version"]
