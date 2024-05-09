@@ -22,7 +22,9 @@ ENVIRONMENT_YAML = dedent("""\
     - pytest
     - pip
     - pip:
+      - private-package
       - fastapi==0.110.0
+      - click[extras]
       - -e .
     name: some-environment-name
 """)
@@ -40,7 +42,7 @@ def test_load_environment_yaml(environment_yaml):
             "python=3.10",
             "pytest",
             "pip",
-            {"pip": ["fastapi==0.110.0", "-e ."]},
+            {"pip": ["private-package", "fastapi==0.110.0", "click[extras]", "-e ."]},
         ],
         "name": "some-environment-name",
     }
@@ -138,7 +140,11 @@ def test_add_comments_to_env_file(tmp_path):
         fp.write(ENVIRONMENT_YAML)
 
     # Modify the file in-place
-    add_comments_to_env_file(env_file_path, load_dependencies())
+    add_comments_to_env_file(
+        env_file_path,
+        load_dependencies(),
+        pip_index_overrides={"private-package": "https://private-index.com/simple"},
+    )
 
     with env_file_path.open("r") as fp:
         new_contents = fp.read()
@@ -155,8 +161,12 @@ def test_add_comments_to_env_file(tmp_path):
         # renovate: datasource=conda depName=main/pip
         - pip
         - pip:
+          # renovate: datasource=pypi registryUrl=https://private-index.com/simple
+          - private-package
           # renovate: datasource=pypi
           - fastapi==0.110.0
+          # renovate: datasource=pypi
+          - click[extras]==8.1.7
           - -e .
         name: some-environment-name
     """)
