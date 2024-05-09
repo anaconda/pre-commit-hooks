@@ -32,7 +32,8 @@ python_version = "3.9"
 addopts = [
   "--cov",
   "--color=yes",
-  "--cov-report=xml:./coverage.xml"
+  "--cov-report=xml:./coverage.xml",
+  "--cov-report=term-missing"
 ]
 filterwarnings = ["error"]
 norecursedirs = ["env"]
