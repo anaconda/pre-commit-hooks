@@ -25,12 +25,14 @@ jobs:
         max-age: 604800 # Leave only caches accessed in the last 7 days (default)
 
     - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9   # v4
+      id: cache-env
       with:
         path: |
           ./env
         key: conda-env|${{ hashFiles('environment-dev.yml') }}
 
     - name: Setup conda environment
+      if: steps.cache-env.outputs.cache-hit != 'true'
       run: make setup
 
     - name: Run tests
