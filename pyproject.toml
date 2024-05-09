@@ -29,6 +29,12 @@ files = [
 python_version = "3.9"
 
 [tool.pytest.ini_options]
+addopts = [
+  "--cov",
+  "--color=yes",
+  "--cov-report=xml:./coverage.xml",
+  "--cov-report=term-missing"
+]
 filterwarnings = ["error"]
 norecursedirs = ["env"]
 pythonpath = "src/"

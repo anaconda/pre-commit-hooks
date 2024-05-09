@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Automagically add renovate comments to conda environment files.
 
 Given a number of paths specified as CLI arguments, we extract the unique app directories
@@ -8,13 +7,10 @@ based on its own include rules specified in .pre-commit-config.yaml.
 
 """
 
-import contextlib
 import json
-import os
 import re
 import shlex
 import subprocess
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Annotated, NamedTuple, Optional, TypedDict
 
@@ -40,16 +36,36 @@ class Dependencies(NamedTuple):
     conda: dict[str, Dependency]
 
 
-@contextlib.contextmanager
-def working_dir(d: Path) -> Iterator[None]:
-    orig = Path.cwd()
-    os.chdir(d)
-    yield
-    os.chdir(orig)
+def setup_conda_environment(command: str, *, cwd: Optional[Path] = None) -> None:
+    """Ensure the conda environment is setup and updated."""
+    cwd = cwd or Path.cwd()
+    result = subprocess.run(
+        shlex.split(command), capture_output=True, text=True, cwd=cwd
+    )
+    if result.returncode != 0:
+        print(f"Failed to run setup command in {cwd}")
+        print(result.stdout)
+        print(result.stderr)
+        result.check_returncode()
+
+
+def list_packages_in_conda_environment(environment_selector: str) -> list[dict]:
+    # Then we list the actual versions of each package in the environment
+    result = subprocess.run(
+        ["conda", "list", *shlex.split(environment_selector), "--json"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(result.stdout)
+        print(result.stderr)
+        result.check_returncode()
+
+    return json.loads(result.stdout)
 
 
 def load_dependencies(
-    project_directory: Path,
+    project_directory: Optional[Path] = None,
     create_command: str = "make setup",
     environment_selector: str = "-p ./env",
 ) -> Dependencies:
@@ -64,63 +80,44 @@ def load_dependencies(
         An object containing all dependencies in the installed environment, split between conda and pip packages.
 
     """
-    with working_dir(project_directory):
-        # First ensure the conda environment exists
-        result = subprocess.run(
-            shlex.split(create_command), capture_output=True, text=True
+    setup_conda_environment(create_command, cwd=project_directory or Path.cwd())
+
+    data = list_packages_in_conda_environment(environment_selector)
+
+    # We split the list separately into pip & conda dependencies
+    pip_deps = {
+        x["name"]: Dependency(
+            name=x["name"], channel=x["channel"], version=x["version"]
         )
-        if result.returncode != 0:
-            print(f"Failed to run make setup for {project_directory}")
-            print(result.stdout)
-            print(result.stderr)
-            result.check_returncode()
+        for x in data
+        if x["channel"] == "pypi"
+    }
 
-        # Then we list the actual versions of each package in the environment
-        result = subprocess.run(
-            ["conda", "list", *shlex.split(environment_selector), "--json"],
-            capture_output=True,
-            text=True,
+    # We use endswith to match both pkgs/main and repo/main to main
+    conda_deps = {
+        x["name"]: Dependency(
+            name=x["name"],
+            channel="main" if x["channel"].endswith("/main") else x["channel"],
+            version=x["version"],
         )
-        if result.returncode != 0:
-            print(result.stdout)
-            print(result.stderr)
-            result.check_returncode()
-        data = json.loads(result.stdout)
-
-        # We split the list separately into pip & conda dependencies
-        pip_deps = {
-            x["name"]: Dependency(
-                name=x["name"], channel=x["channel"], version=x["version"]
-            )
-            for x in data
-            if x["channel"] == "pypi"
-        }
-
-        # We use endswith to match both pkgs/main and repo/main to main
-        conda_deps = {
-            x["name"]: Dependency(
-                name=x["name"],
-                channel="main" if x["channel"].endswith("/main") else x["channel"],
-                version=x["version"],
-            )
-            for x in data
-            if x["channel"] != "pypi"
-        }
-        if len(pip_deps) + len(conda_deps) != len(data):
-            raise ValueError("Mismatch parsing dependencies")
-        return Dependencies(pip=pip_deps, conda=conda_deps)
+        for x in data
+        if x["channel"] != "pypi"
+    }
+    if len(pip_deps) + len(conda_deps) != len(data):
+        raise ValueError("Mismatch parsing dependencies")
+    return Dependencies(pip=pip_deps, conda=conda_deps)
 
 
-def process_environment_file(
+def add_comments_to_env_file(
     env_file: Path,
     dependencies: Dependencies,
     *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
-    pypi_index_overrides: Optional[IndexOverrides] = None,
+    pip_index_overrides: Optional[IndexOverrides] = None,
 ) -> None:
     """Process an environment file, which entails adding renovate comments and pinning the installed version."""
     conda_channel_overrides = conda_channel_overrides or {}
-    pypi_index_overrides = pypi_index_overrides or {}
+    pip_index_overrides = pip_index_overrides or {}
 
     with env_file.open() as fp:
         in_lines = fp.readlines()
@@ -176,7 +173,7 @@ def process_environment_file(
             if package_name != ".":
                 if datasource == "conda":
                     renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} depName={dep_name}\n"
-                elif (index_url := pypi_index_overrides.get(dep_name)) is not None:
+                elif (index_url := pip_index_overrides.get(dep_name)) is not None:
                     renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} registryUrl={index_url}\n"
                 else:
                     renovate_line = (
@@ -202,24 +199,7 @@ def process_environment_file(
         fp.writelines(out_lines)
 
 
-def add_comments_to_env_files(
-    env_files: list[Path],
-    dependencies: Dependencies,
-    *,
-    conda_channel_overrides: Optional[ChannelOverrides] = None,
-    pypi_index_overrides: Optional[IndexOverrides] = None,
-) -> None:
-    """Process each environment file found."""
-    for f in env_files:
-        process_environment_file(
-            f,
-            dependencies,
-            conda_channel_overrides=conda_channel_overrides,
-            pypi_index_overrides=pypi_index_overrides,
-        )
-
-
-def _parse_pip_index_overrides(
+def parse_pip_index_overrides(
     internal_pip_index_url: str, internal_pip_package: list[str]
 ) -> dict[PackageName, IndexUrl]:
     pip_index_overrides = {}
@@ -235,7 +215,7 @@ def cli(
     internal_pip_index_url: Annotated[str, typer.Option()] = "",
 ) -> None:
     # Construct a mapping of package name to index URL based on CLI options
-    pip_index_overrides = _parse_pip_index_overrides(
+    pip_index_overrides = parse_pip_index_overrides(
         internal_pip_index_url, internal_pip_package or []
     )
 
@@ -244,15 +224,12 @@ def cli(
     project_dirs = sorted({env_file.parent for env_file in env_files})
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)
-        project_env_files = [e for e in env_files if e.parent == project_dir]
-        add_comments_to_env_files(
-            project_env_files, deps, pypi_index_overrides=pip_index_overrides
-        )
+        project_env_files = (e for e in env_files if e.parent == project_dir)
+        for env_file in project_env_files:
+            add_comments_to_env_file(
+                env_file, deps, pip_index_overrides=pip_index_overrides
+            )
 
 
 def main() -> None:
-    typer.run(cli)
-
-
-if __name__ == "__main__":
-    main()
+    typer.run(cli)  # pragma: nocover
