@@ -13,7 +13,8 @@ import os
 import re
 import subprocess
 from pathlib import Path
-from typing import NamedTuple, Optional, TypedDict, Annotated
+from typing import Annotated, NamedTuple, Optional, TypedDict
+
 import typer
 
 CondaOrPip = str
