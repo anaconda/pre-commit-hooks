@@ -40,3 +40,10 @@ jobs:
 
     - name: Run tests
       run: make test
+
+    - name: Report coverage
+      id: coverage
+      if: ${{ !cancelled() }}
+      uses: MishaKav/pytest-coverage-comment@a1fe18e2b00c64a765568e2edb9f1706eb8fc88b # v1.1.51
+      with:
+        title: Coverage Report
