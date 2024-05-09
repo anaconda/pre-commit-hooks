@@ -21,6 +21,13 @@ version = "0.1.0"
 generate-renovate-annotations = "anaconda_pre_commit_hooks.add_renovate_annotations:main"
 run-cog = "anaconda_pre_commit_hooks.run_cog:main"
 
+[tool.mypy]
+disallow_untyped_defs = true
+files = [
+  "src/**/*.py"
+]
+python_version = "3.9"
+
 [tool.pytest.ini_options]
 filterwarnings = ["error"]
 norecursedirs = ["env"]

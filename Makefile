@@ -28,6 +28,9 @@ install-hooks:  ## Download + install all pre-commit hooks
 pre-commit:  ## Run pre-commit against all files
 	pre-commit run --verbose --show-diff-on-failure --color=always --all-files
 
+type-check:  ## Run static type checks
+	$(conda_run) mypy
+
 test:  ## Run all the unit tests
 	$(conda_run) pytest
 

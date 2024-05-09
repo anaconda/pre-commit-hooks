@@ -35,5 +35,8 @@ jobs:
       if: steps.cache-env.outputs.cache-hit != 'true'
       run: make setup
 
+    - name: Run static type check
+      run: make type-check
+
     - name: Run tests
       run: make test

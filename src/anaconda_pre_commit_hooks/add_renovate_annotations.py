@@ -14,6 +14,7 @@ import os
 import re
 import shlex
 import subprocess
+from collections.abc import Iterator
 from pathlib import Path
 from typing import Annotated, NamedTuple, Optional, TypedDict
 
@@ -40,7 +41,7 @@ class Dependencies(NamedTuple):
 
 
 @contextlib.contextmanager
-def working_dir(d: Path):
+def working_dir(d: Path) -> Iterator[None]:
     orig = Path.cwd()
     os.chdir(d)
     yield
@@ -116,7 +117,7 @@ def process_environment_file(
     *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
     pypi_index_overrides: Optional[IndexOverrides] = None,
-):
+) -> None:
     """Process an environment file, which entails adding renovate comments and pinning the installed version."""
     conda_channel_overrides = conda_channel_overrides or {}
     pypi_index_overrides = pypi_index_overrides or {}
@@ -124,7 +125,7 @@ def process_environment_file(
     with env_file.open() as fp:
         in_lines = fp.readlines()
 
-    out_lines = []
+    out_lines: list[str] = []
     in_dependencies = False
     in_pip_dependencies = False
     for raw_line in in_lines:
