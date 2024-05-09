@@ -52,6 +52,17 @@ def load_dependencies(
     create_command: str = "make setup",
     environment_selector: str = "-p ./env",
 ) -> Dependencies:
+    """Load the dependencies from a live conda environment.
+
+    Args:
+        project_directory: The directory in which the project is located.
+        create_command: A command used to create a new conda environment from the environment file(s).
+        environment_selector: A string used to select the environment (-p ./env or -n name for a named environment).
+
+    Returns:
+        An object containing all dependencies in the installed environment, split between conda and pip packages.
+
+    """
     with working_dir(project_directory):
         # First ensure the conda environment exists
         result = subprocess.run(
