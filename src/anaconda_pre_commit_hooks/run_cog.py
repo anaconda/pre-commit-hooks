@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import argparse
 import subprocess
-from pathlib import Path
 from collections.abc import Sequence
+from pathlib import Path
 
 
 def run_cog(
