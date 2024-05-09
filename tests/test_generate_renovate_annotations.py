@@ -19,6 +19,7 @@ ENVIRONMENT_YAML = dedent("""\
     - defaults
     dependencies:
     - python=3.10
+    # renovate: comment to be overridden
     - pytest
     - pip
     - pip:
