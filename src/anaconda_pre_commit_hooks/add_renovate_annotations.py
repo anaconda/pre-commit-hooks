@@ -232,8 +232,4 @@ def cli(
 
 
 def main() -> None:
-    typer.run(cli)
-
-
-if __name__ == "__main__":
-    main()
+    typer.run(cli)  # pragma: nocover
