@@ -102,14 +102,14 @@ def mock_subprocess_run(monkeypatch):
                 "",
             )
         else:
-            return old_subprocess_run(args, *posargs, **kwargs)
+            return old_subprocess_run(args, *posargs, **kwargs)  # pragma: nocover
 
     monkeypatch.setattr(subprocess, "run", f)
 
 
 @pytest.mark.usefixtures("mock_subprocess_run")
 def test_setup_conda_environment():
-    result = setup_conda_environment()
+    result = setup_conda_environment("make setup")
     assert result is None
 
 

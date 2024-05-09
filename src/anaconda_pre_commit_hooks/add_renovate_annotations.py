@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """Automagically add renovate comments to conda environment files.
 
 Given a number of paths specified as CLI arguments, we extract the unique app directories
@@ -8,13 +7,10 @@ based on its own include rules specified in .pre-commit-config.yaml.
 
 """
 
-import contextlib
 import json
-import os
 import re
 import shlex
 import subprocess
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Annotated, NamedTuple, Optional, TypedDict
 
@@ -40,27 +36,20 @@ class Dependencies(NamedTuple):
     conda: dict[str, Dependency]
 
 
-@contextlib.contextmanager
-def working_dir(d: Path) -> Iterator[None]:
-    orig = Path.cwd()
-    os.chdir(d)
-    yield
-    os.chdir(orig)
-
-
-def setup_conda_environment(command: str = "make setup") -> None:
+def setup_conda_environment(command: str, *, cwd: Optional[Path] = None) -> None:
     """Ensure the conda environment is setup and updated."""
-    result = subprocess.run(shlex.split(command), capture_output=True, text=True)
+    cwd = cwd or Path.cwd()
+    result = subprocess.run(
+        shlex.split(command), capture_output=True, text=True, cwd=cwd
+    )
     if result.returncode != 0:
-        print(f"Failed to run setup command in {Path.cwd()}")
+        print(f"Failed to run setup command in {cwd}")
         print(result.stdout)
         print(result.stderr)
         result.check_returncode()
 
 
-def list_packages_in_conda_environment(
-    environment_selector: str = "-p ./env",
-) -> list[dict]:
+def list_packages_in_conda_environment(environment_selector: str) -> list[dict]:
     # Then we list the actual versions of each package in the environment
     result = subprocess.run(
         ["conda", "list", *shlex.split(environment_selector), "--json"],
@@ -91,33 +80,32 @@ def load_dependencies(
         An object containing all dependencies in the installed environment, split between conda and pip packages.
 
     """
-    with working_dir(project_directory):
-        setup_conda_environment(create_command)
+    setup_conda_environment(create_command, cwd=project_directory)
 
-        data = list_packages_in_conda_environment(environment_selector)
+    data = list_packages_in_conda_environment(environment_selector)
 
-        # We split the list separately into pip & conda dependencies
-        pip_deps = {
-            x["name"]: Dependency(
-                name=x["name"], channel=x["channel"], version=x["version"]
-            )
-            for x in data
-            if x["channel"] == "pypi"
-        }
+    # We split the list separately into pip & conda dependencies
+    pip_deps = {
+        x["name"]: Dependency(
+            name=x["name"], channel=x["channel"], version=x["version"]
+        )
+        for x in data
+        if x["channel"] == "pypi"
+    }
 
-        # We use endswith to match both pkgs/main and repo/main to main
-        conda_deps = {
-            x["name"]: Dependency(
-                name=x["name"],
-                channel="main" if x["channel"].endswith("/main") else x["channel"],
-                version=x["version"],
-            )
-            for x in data
-            if x["channel"] != "pypi"
-        }
-        if len(pip_deps) + len(conda_deps) != len(data):
-            raise ValueError("Mismatch parsing dependencies")
-        return Dependencies(pip=pip_deps, conda=conda_deps)
+    # We use endswith to match both pkgs/main and repo/main to main
+    conda_deps = {
+        x["name"]: Dependency(
+            name=x["name"],
+            channel="main" if x["channel"].endswith("/main") else x["channel"],
+            version=x["version"],
+        )
+        for x in data
+        if x["channel"] != "pypi"
+    }
+    if len(pip_deps) + len(conda_deps) != len(data):
+        raise ValueError("Mismatch parsing dependencies")
+    return Dependencies(pip=pip_deps, conda=conda_deps)
 
 
 def process_environment_file(
