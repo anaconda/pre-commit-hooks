@@ -8,6 +8,7 @@ import yaml
 from anaconda_pre_commit_hooks.add_renovate_annotations import (
     Dependencies,
     Dependency,
+    add_comments_to_env_file,
     load_dependencies,
     parse_pip_index_overrides,
     setup_conda_environment,
@@ -120,3 +121,31 @@ def test_load_dependencies():
         pip={"click": Dependency(name="click", channel="pypi", version="8.1.7")},
         conda={"python": Dependency(name="python", channel="main", version="3.10.14")},
     )
+
+
+@pytest.mark.usefixtures("mock_subprocess_run")
+def test_add_comments_to_env_file(tmp_path):
+    env_file_path = tmp_path / "environment.yml"
+    with env_file_path.open("w") as fp:
+        fp.write(ENVIRONMENT_YAML)
+
+    # Modify the file in-place
+    add_comments_to_env_file(env_file_path, load_dependencies())
+
+    with env_file_path.open("r") as fp:
+        new_contents = fp.read()
+
+    # Compare the results. Versions and channels should come from the mock above.
+    assert new_contents == dedent("""\
+        channels:
+        - defaults
+        dependencies:
+        # renovate: datasource=conda depName=main/python
+        - python=3.10.14
+        # renovate: datasource=conda depName=main/pytest
+        - pytest
+        # renovate: datasource=conda depName=main/pip
+        - pip
+        - pip:
+          - -e .
+    """)

@@ -65,7 +65,7 @@ def list_packages_in_conda_environment(environment_selector: str) -> list[dict]:
 
 
 def load_dependencies(
-    project_directory: Path,
+    project_directory: Optional[Path] = None,
     create_command: str = "make setup",
     environment_selector: str = "-p ./env",
 ) -> Dependencies:
@@ -80,7 +80,7 @@ def load_dependencies(
         An object containing all dependencies in the installed environment, split between conda and pip packages.
 
     """
-    setup_conda_environment(create_command, cwd=project_directory)
+    setup_conda_environment(create_command, cwd=project_directory or Path.cwd())
 
     data = list_packages_in_conda_environment(environment_selector)
 
