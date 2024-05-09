@@ -48,6 +48,16 @@ def working_dir(d: Path) -> Iterator[None]:
     os.chdir(orig)
 
 
+def setup_conda_environment(command: str = "make setup") -> None:
+    """Ensure the conda environment is setup and updated."""
+    result = subprocess.run(shlex.split(command), capture_output=True, text=True)
+    if result.returncode != 0:
+        print(f"Failed to run setup command in {Path.cwd()}")
+        print(result.stdout)
+        print(result.stderr)
+        result.check_returncode()
+
+
 def load_dependencies(
     project_directory: Path,
     create_command: str = "make setup",
@@ -65,15 +75,7 @@ def load_dependencies(
 
     """
     with working_dir(project_directory):
-        # First ensure the conda environment exists
-        result = subprocess.run(
-            shlex.split(create_command), capture_output=True, text=True
-        )
-        if result.returncode != 0:
-            print(f"Failed to run make setup for {project_directory}")
-            print(result.stdout)
-            print(result.stderr)
-            result.check_returncode()
+        setup_conda_environment(create_command)
 
         # Then we list the actual versions of each package in the environment
         result = subprocess.run(

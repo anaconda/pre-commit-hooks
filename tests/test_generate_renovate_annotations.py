@@ -1,8 +1,12 @@
+import subprocess
 from textwrap import dedent
 
 import pytest
 import yaml
-from anaconda_pre_commit_hooks.add_renovate_annotations import parse_pip_index_overrides
+from anaconda_pre_commit_hooks.add_renovate_annotations import (
+    parse_pip_index_overrides,
+    setup_conda_environment,
+)
 
 ENVIRONMENT_YAML = dedent("""\
     channels:
@@ -48,3 +52,27 @@ def test_parse_pip_index_overrides(index_url, packages, expect_empty):
         assert result == {}
     else:
         assert result == {p: index_url for p in packages}
+
+
+@pytest.fixture()
+def mock_subprocess_run(monkeypatch):
+    old_subprocess_run = subprocess.run
+
+    def f(args, *posargs, **kwargs):
+        if args == ["make", "setup"]:
+            return subprocess.CompletedProcess(
+                args,
+                0,
+                "",
+                "",
+            )
+        else:
+            return old_subprocess_run(args, *posargs, **kwargs)
+
+    monkeypatch.setattr(subprocess, "run", f)
+
+
+@pytest.mark.usefixtures("mock_subprocess_run")
+def test_setup_conda_environment():
+    result = setup_conda_environment()
+    assert result is None
