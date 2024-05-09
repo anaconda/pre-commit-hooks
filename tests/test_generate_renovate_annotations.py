@@ -1,9 +1,14 @@
+import json
 import subprocess
+from pathlib import Path
 from textwrap import dedent
 
 import pytest
 import yaml
 from anaconda_pre_commit_hooks.add_renovate_annotations import (
+    Dependencies,
+    Dependency,
+    load_dependencies,
     parse_pip_index_overrides,
     setup_conda_environment,
 )
@@ -66,6 +71,36 @@ def mock_subprocess_run(monkeypatch):
                 "",
                 "",
             )
+        elif args[:2] == ["conda", "list"]:
+            return subprocess.CompletedProcess(
+                args,
+                0,
+                json.dumps(
+                    [
+                        {
+                            "base_url": "https://conda.anaconda.org/pypi",
+                            "build_number": 0,
+                            "build_string": "pypi_0",
+                            "channel": "pypi",
+                            "dist_name": "click-8.1.7-pypi_0",
+                            "name": "click",
+                            "platform": "pypi",
+                            "version": "8.1.7",
+                        },
+                        {
+                            "base_url": "https://repo.anaconda.com/pkgs/main",
+                            "build_number": 1,
+                            "build_string": "hb885b13_1",
+                            "channel": "pkgs/main",
+                            "dist_name": "python-3.10.14-hb885b13_1",
+                            "name": "python",
+                            "platform": "osx-arm64",
+                            "version": "3.10.14",
+                        },
+                    ]
+                ),
+                "",
+            )
         else:
             return old_subprocess_run(args, *posargs, **kwargs)
 
@@ -76,3 +111,12 @@ def mock_subprocess_run(monkeypatch):
 def test_setup_conda_environment():
     result = setup_conda_environment()
     assert result is None
+
+
+@pytest.mark.usefixtures("mock_subprocess_run")
+def test_load_dependencies():
+    dependencies = load_dependencies(Path.cwd())
+    assert dependencies == Dependencies(
+        pip={"click": Dependency(name="click", channel="pypi", version="8.1.7")},
+        conda={"python": Dependency(name="python", channel="main", version="3.10.14")},
+    )

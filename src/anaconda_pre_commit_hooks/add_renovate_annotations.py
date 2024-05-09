@@ -58,6 +58,23 @@ def setup_conda_environment(command: str = "make setup") -> None:
         result.check_returncode()
 
 
+def list_packages_in_conda_environment(
+    environment_selector: str = "-p ./env",
+) -> list[dict]:
+    # Then we list the actual versions of each package in the environment
+    result = subprocess.run(
+        ["conda", "list", *shlex.split(environment_selector), "--json"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        print(result.stdout)
+        print(result.stderr)
+        result.check_returncode()
+
+    return json.loads(result.stdout)
+
+
 def load_dependencies(
     project_directory: Path,
     create_command: str = "make setup",
@@ -77,17 +94,7 @@ def load_dependencies(
     with working_dir(project_directory):
         setup_conda_environment(create_command)
 
-        # Then we list the actual versions of each package in the environment
-        result = subprocess.run(
-            ["conda", "list", *shlex.split(environment_selector), "--json"],
-            capture_output=True,
-            text=True,
-        )
-        if result.returncode != 0:
-            print(result.stdout)
-            print(result.stderr)
-            result.check_returncode()
-        data = json.loads(result.stdout)
+        data = list_packages_in_conda_environment(environment_selector)
 
         # We split the list separately into pip & conda dependencies
         pip_deps = {
