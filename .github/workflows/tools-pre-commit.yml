@@ -25,13 +25,18 @@ concurrency:
 
 jobs:
   pre-commit:
-    runs-on:
-      labels:
-      - self-hosted-main
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b   # v4.1.4
       with:
         token: ${{ secrets.ANACONDA_BOT_PRE_COMMIT }}
+
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: install pre-commit
+      run: pip install pre-commit
 
     - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9   # v4
       with:
