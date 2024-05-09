@@ -2,6 +2,7 @@ channels:
 - defaults
 dependencies:
 - python=3.10
+- pytest
 - pip
 - pip:
   - -e .
