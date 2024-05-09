@@ -209,15 +209,14 @@ def cli(
     internal_pip_package: Annotated[Optional[list[str]], typer.Option()] = None,
     internal_pip_index_url: Annotated[str, typer.Option()] = "",
 ) -> None:
-    # Group into a list of parent directories. This prevents us from running
-    # `make setup` for each file, and only once per project.
-    project_dirs = sorted({env_file.parent for env_file in env_files})
-
     # Construct a mapping of package name to index URL based on CLI options
     pip_index_overrides = _parse_pip_index_overrides(
         internal_pip_index_url, internal_pip_package or []
     )
 
+    # Group into a list of parent directories. This prevents us from running
+    # `make setup` for each file, and only once per project.
+    project_dirs = sorted({env_file.parent for env_file in env_files})
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)
         project_env_files = [e for e in env_files if e.parent == project_dir]
