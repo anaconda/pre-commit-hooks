@@ -23,6 +23,7 @@ ENVIRONMENT_YAML = dedent("""\
     - pip
     - pip:
       - -e .
+    name: some-environment-name
 """)
 
 
@@ -35,6 +36,7 @@ def test_load_environment_yaml(environment_yaml):
     assert environment_yaml == {
         "channels": ["defaults"],
         "dependencies": ["python=3.10", "pytest", "pip", {"pip": ["-e ."]}],
+        "name": "some-environment-name",
     }
 
 
@@ -148,4 +150,5 @@ def test_add_comments_to_env_file(tmp_path):
         - pip
         - pip:
           - -e .
+        name: some-environment-name
     """)
