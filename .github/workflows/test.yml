@@ -1,0 +1,42 @@
+name: '[CI] Test'
+
+on:
+  # Caches have a certain level of isolation, see https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows#restrictions-for-accessing-a-cache
+  # We run on push to main to have all caches in the main branch so that they can be reused for PRs.
+  push:
+    branches:
+    - main
+  merge_group:
+  pull_request:
+
+# Cancel a previous job if the same workflow is triggers on the same PR or commit.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+
+    - uses: MyAlbum/purge-cache@v2
+      with:
+        max-age: 604800 # Leave only caches accessed in the last 7 days (default)
+
+    - uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9   # v4
+      id: cache-env
+      with:
+        path: |
+          ./env
+        key: conda-env|${{ hashFiles('environment-dev.yml') }}
+
+    - name: Setup conda environment
+      if: steps.cache-env.outputs.cache-hit != 'true'
+      run: make setup
+
+    - name: Run static type check
+      run: make type-check
+
+    - name: Run tests
+      run: make test

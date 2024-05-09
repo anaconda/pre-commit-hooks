@@ -11,3 +11,10 @@
   entry: run-cog
   args: [--working-directory-level, '-1']
   language: python
+- id: generate-renovate-annotations
+  name: generate-renovate-annotations
+  description: Generate Renovate tags in environment.yml files
+  entry: generate-renovate-annotations
+  files: environment.*\.ya?ml
+  args: []
+  language: python

@@ -19,6 +19,7 @@ repos:
     # lint & attempt to correct failures
   - id: ruff
     args: [--fix, --show-fixes]
+  - id: ruff-format
 #- repo: https://github.com/pre-commit/mirrors-eslint
 #  rev: v9.2.0
 #  hooks:

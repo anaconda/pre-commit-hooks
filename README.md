@@ -2,6 +2,33 @@
 
 This repo contains custom `pre-commit` hooks.
 
+## generate-renovate-annotations
+
+The `generate-renovate-annotations` hook is used to add Renovate comments to conda environment files.
+The format of these comments is prescribed with a RegEx rule, with more details in the [.documentation](https://github.com/anaconda/renovate-config/blob/main/docs/conda-environment.md)
+
+By default, this hook will work for all files matching the `environment.*\.ya?ml` regular expression.
+This matches common formats like `environment.yaml`, `environment.yml`, and `environment-suffix.yml`.
+
+To pull pip packages from an alternate index, each package must be specified with the `--internal-pip-package` option (multiple allowed).
+The index URL is specified with the `--internal-pip-index-url` option.
+
+> **Note:** The Renovate worker must be configured with adequate credentials if this URL requires authentication.
+
+An example usage is shown below:
+
+```yaml
+- repo: https://github.com/anaconda/pre-commit-hooks
+  rev: main  # Use the ref you want to point at
+  hooks:
+    - id: generate-renovate-annotations
+      args: [
+      --internal-pip-index-url=https://pypi.anaconda.org/my-organization/simple,
+      --internal-pip-package=my-private-package,
+      --internal-pip-package=my-other-private-package,
+    ]
+```
+
 ## run-cog
 
 The `run-cog` hook can be used to run the [`cog`](https://nedbatchelder.com/code/cog) tool automatically to generate code when committing a file.
