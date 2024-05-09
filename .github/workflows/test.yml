@@ -47,3 +47,4 @@ jobs:
       uses: MishaKav/pytest-coverage-comment@a1fe18e2b00c64a765568e2edb9f1706eb8fc88b # v1.1.51
       with:
         title: Coverage Report
+        pytest-xml-coverage-path: ./coverage.xml
