@@ -113,11 +113,11 @@ def add_comments_to_env_file(
     dependencies: Dependencies,
     *,
     conda_channel_overrides: Optional[ChannelOverrides] = None,
-    pypi_index_overrides: Optional[IndexOverrides] = None,
+    pip_index_overrides: Optional[IndexOverrides] = None,
 ) -> None:
     """Process an environment file, which entails adding renovate comments and pinning the installed version."""
     conda_channel_overrides = conda_channel_overrides or {}
-    pypi_index_overrides = pypi_index_overrides or {}
+    pip_index_overrides = pip_index_overrides or {}
 
     with env_file.open() as fp:
         in_lines = fp.readlines()
@@ -173,7 +173,7 @@ def add_comments_to_env_file(
             if package_name != ".":
                 if datasource == "conda":
                     renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} depName={dep_name}\n"
-                elif (index_url := pypi_index_overrides.get(dep_name)) is not None:
+                elif (index_url := pip_index_overrides.get(dep_name)) is not None:
                     renovate_line = f"{' ' * indentation}# renovate: datasource={datasource} registryUrl={index_url}\n"
                 else:
                     renovate_line = (
@@ -227,9 +227,7 @@ def cli(
         project_env_files = (e for e in env_files if e.parent == project_dir)
         for env_file in project_env_files:
             add_comments_to_env_file(
-                env_file,
-                deps,
-                pypi_index_overrides=pip_index_overrides,
+                env_file, deps, pip_index_overrides=pip_index_overrides
             )
 
 
