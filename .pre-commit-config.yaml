@@ -19,13 +19,13 @@ repos:
     # lint & attempt to correct failures
   - id: ruff
     args: [--fix, --show-fixes]
-- repo: https://github.com/pre-commit/mirrors-eslint
-  rev: v8.56.0
-  hooks:
-  - id: eslint
-    additional_dependencies:
-    - eslint@>=5.16.0
-    - eslint-config-google@latest
+#- repo: https://github.com/pre-commit/mirrors-eslint
+#  rev: v9.2.0
+#  hooks:
+#  - id: eslint
+#    additional_dependencies:
+#    - eslint@>=9.0.0
+#    - eslint-config-google@latest
 - repo: https://github.com/asottile/pyupgrade
   rev: v3.15.2
   hooks:
