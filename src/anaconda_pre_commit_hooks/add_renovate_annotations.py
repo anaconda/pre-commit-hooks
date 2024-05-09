@@ -188,6 +188,14 @@ def add_comments_to_env_files(
         process_environment_file(f, dependencies, conda_channel_overrides=conda_channel_overrides, pypi_index_overrides=pypi_index_overrides)
 
 
+def _parse_pip_index_overrides(internal_pip_index_url: str, internal_pip_package: list[str]) -> dict[PackageName, IndexUrl]:
+    pip_index_overrides = {}
+    if internal_pip_index_url and internal_pip_package:
+        for pkg_name in internal_pip_package:
+            pip_index_overrides[pkg_name] = internal_pip_index_url
+    return pip_index_overrides
+
+
 def cli(
     env_files: list[Path],
     internal_pip_package: Annotated[Optional[list[str]], typer.Option()] = None,
@@ -198,15 +206,14 @@ def cli(
     # `make setup` for each file, and only once per project.
     project_dirs = sorted({env_file.parent for env_file in env_files})
 
-    pip_index_overrides = {}
-    if internal_pip_index_url and internal_pip_package:
-        for pkg_name in internal_pip_package:
-            pip_index_overrides[pkg_name] = internal_pip_index_url
+    # Construct a mapping of package name to index URL based on CLI options
+    pip_index_overrides = _parse_pip_index_overrides(internal_pip_index_url, internal_pip_package or [])
 
     for project_dir in project_dirs:
         deps = load_dependencies(project_dir)
         project_env_files = [e for e in env_files if e.parent == project_dir]
         add_comments_to_env_files(project_env_files, deps, pypi_index_overrides=pip_index_overrides)
+
 
 
 def main() -> None:
