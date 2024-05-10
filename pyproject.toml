@@ -18,8 +18,8 @@ requires-python = ">=3.8"
 version = "0.1.0"
 
 [project.scripts]
-generate-renovate-annotations = "anaconda_pre_commit_hooks.add_renovate_annotations:main"
-run-cog = "anaconda_pre_commit_hooks.run_cog:cli"
+generate-renovate-annotations = "anaconda_pre_commit_hooks.add_renovate_annotations:app"
+run-cog = "anaconda_pre_commit_hooks.run_cog:main"
 
 [tool.mypy]
 disallow_untyped_defs = true
