@@ -35,56 +35,55 @@ An example usage is shown below:
 The hook is backed by a CLI command, whose help output is reproduced below:
 
 <!-- [[[cog
-import os, sys; sys.path.insert(0, os.path.join(os.getcwd(), "dev"))
-from generate_cli_output import main
-main(command="generate-renovate-annotations --help")
+#import os, sys; sys.path.insert(0, os.path.join(os.getcwd(), "dev"))
+#from generate_cli_output import main
+#main(command="generate-renovate-annotations --help")
 ]]] -->
-```shell
-[1m                                                                                [0m
-[1m [0m[1;33mUsage: [0m[1mgenerate-renovate-annotations [OPTIONS] ENV_FILES... COMMAND [ARGS]...[0m[1m [0m[1m [0m
-[1m                                                                                [0m
- Generate Renovate comments for a list of `conda` environment files.
- [2mFor each file, we:[0m
- [2m* Run a command to ensure the environment is created/updated[0m
- [2m* Extract a list of installed packages in that environment, including pip[0m
- [2m* Generate a Renovate annotation comment, including the package name and [0m
- [2mchannel.[0m
- [2mThis step also allows for overriding the index of pip packages.[0m
- [2m* Pin the exact installed version of each dependency.[0m
-
-[2m╭─[0m[2m Arguments [0m[2m─────────────────────────────────────────────────────────────────[0m[2m─╮[0m
-[2m│[0m [31m*[0m    env_files      [1;33mENV_FILES...[0m  A list of conda environment files,         [2m│[0m
-[2m│[0m                                   typically passed in from pre-commit        [2m│[0m
-[2m│[0m                                   automatically                              [2m│[0m
-[2m│[0m                                   [2m[default: None]                           [0m [2m│[0m
-[2m│[0m                                   [2;31m[required]                                [0m [2m│[0m
-[2m╰──────────────────────────────────────────────────────────────────────────────╯[0m
-[2m╭─[0m[2m Options [0m[2m───────────────────────────────────────────────────────────────────[0m[2m─╮[0m
-[2m│[0m [1;36m-[0m[1;36m-internal[0m[1;36m-pip-package[0m                [1;33mTEXT[0m  One or more packages to pull     [2m│[0m
-[2m│[0m                                             from the                         [2m│[0m
-[2m│[0m                                             [1;36m-[0m[1;36m-internal[0m[1;36m-pip-index-url[0m         [2m│[0m
-[2m│[0m                                             [2m[default: None]                 [0m [2m│[0m
-[2m│[0m [1;36m-[0m[1;36m-internal[0m[1;36m-pip-index-url[0m              [1;33mTEXT[0m  An optional extra pip index URL, [2m│[0m
-[2m│[0m                                             used in conjunction with the     [2m│[0m
-[2m│[0m                                             [1;36m-[0m[1;36m-internal[0m[1;36m-pip-package[0m option    [2m│[0m
-[2m│[0m [1;36m-[0m[1;36m-create[0m[1;36m-command[0m                      [1;33mTEXT[0m  A command to invoke at each      [2m│[0m
-[2m│[0m                                             parent directory of all          [2m│[0m
-[2m│[0m                                             environment files to ensure the  [2m│[0m
-[2m│[0m                                             conda environment is created and [2m│[0m
-[2m│[0m                                             updated                          [2m│[0m
-[2m│[0m                                             [2m[default: make setup]           [0m [2m│[0m
-[2m│[0m [1;36m-[0m[1;36m-environment[0m[1;36m-selector[0m                [1;33mTEXT[0m  A string used to select the      [2m│[0m
-[2m│[0m                                             conda environment, either        [2m│[0m
-[2m│[0m                                             prefix-based (recommended) or    [2m│[0m
-[2m│[0m                                             named                            [2m│[0m
-[2m│[0m                                             [2m[default: -p ./env]             [0m [2m│[0m
-[2m│[0m [1;36m-[0m[1;36m-disable[0m[1;36m-environment-creation[0m        [1;33m    [0m  If set, environment will not be  [2m│[0m
-[2m│[0m                                             created/updated before           [2m│[0m
-[2m│[0m                                             annotations are added.           [2m│[0m
-[2m│[0m [1;36m-[0m[1;36m-help[0m                                [1;33m    [0m  Show this message and exit.      [2m│[0m
-[2m╰──────────────────────────────────────────────────────────────────────────────╯[0m
-```
 <!-- [[[end]]] -->
+```shell
+Usage: generate-renovate-annotations [OPTIONS] ENV_FILES... COMMAND [ARGS]...
+
+ Generate Renovate comments for a list of conda environment files.
+ For each file, we:
+
+  • Run a command to ensure the environment is created/updated
+  • Extract a list of installed packages in that environment, including pip
+  • Generate a Renovate annotation comment, including the package name and
+    channel. This step also allows for overriding the index of pip packages.
+  • Pin the exact installed version of each dependency.
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    env_files      ENV_FILES...  A list of conda environment files,         │
+│                                   typically passed in from pre-commit        │
+│                                   automatically                              │
+│                                   [default: None]                            │
+│                                   [required]                                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --internal-pip-package                TEXT  One or more packages to pull     │
+│                                             from the                         │
+│                                             --internal-pip-index-url         │
+│                                             [default: None]                  │
+│ --internal-pip-index-url              TEXT  An optional extra pip index URL, │
+│                                             used in conjunction with the     │
+│                                             --internal-pip-package option    │
+│ --create-command                      TEXT  A command to invoke at each      │
+│                                             parent directory of all          │
+│                                             environment files to ensure the  │
+│                                             conda environment is created and │
+│                                             updated                          │
+│                                             [default: make setup]            │
+│ --environment-selector                TEXT  A string used to select the      │
+│                                             conda environment, either        │
+│                                             prefix-based (recommended) or    │
+│                                             named                            │
+│                                             [default: -p ./env]              │
+│ --disable-environment-creation              If set, environment will not be  │
+│                                             created/updated before           │
+│                                             annotations are added.           │
+│ --help                                      Show this message and exit.      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+```
 
 ## run-cog
 
@@ -146,15 +145,15 @@ import os, sys; sys.path.insert(0, os.path.join(os.getcwd(), "dev"))
 from generate_makefile_targets_table import main; main()
 ]]] -->
 <!-- THE FOLLOWING CODE IS GENERATED BY COG VIA PRE-COMMIT. ANY MANUAL CHANGES WILL BE LOST. -->
-| Target          | Description                                                              |
-|-----------------|--------------------------------------------------------------------------|
-| `help`          | Display help on all Makefile targets                                     |
-| `setup`         | Setup local conda environment for development                            |
-| `install-hooks` | Download + install all pre-commit hooks                                  |
-| `pre-commit`    | Run pre-commit against all files                                         |
-| `type-check`    | Run static type checks                                                   |
-| `test`          | Run all the unit tests                                                   |
-| `cog-readme`    | Run cog on the README.md to generate command output                      |
+| Target          | Description                                         |
+|-----------------|-----------------------------------------------------|
+| `help`          | Display help on all Makefile targets                |
+| `setup`         | Setup local conda environment for development       |
+| `install-hooks` | Download + install all pre-commit hooks             |
+| `pre-commit`    | Run pre-commit against all files                    |
+| `type-check`    | Run static type checks                              |
+| `test`          | Run all the unit tests                              |
+| `cog-readme`    | Run cog on the README.md to generate command output |
 <!-- [[[end]]] -->
 
 > **Note:** Interestingly, the table above is generated by the `cog` hook defined in this repo :smile:
