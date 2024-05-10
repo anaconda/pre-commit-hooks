@@ -14,6 +14,8 @@ from anaconda_pre_commit_hooks.add_renovate_annotations import (
     setup_conda_environment,
 )
 
+DEFAULT_FILES_REGEX_STRING = r"environment.*\.ya?ml"
+
 ENVIRONMENT_YAML = dedent("""\
     channels:
     - defaults
@@ -29,6 +31,22 @@ ENVIRONMENT_YAML = dedent("""\
       - -e .
     name: some-environment-name
 """)
+
+
+@pytest.fixture()
+def repo_root() -> Path:
+    return Path(__file__).parents[1]
+
+
+def test_ensure_default_files_regex_in_pre_commit_hooks_yaml_matches_tested(repo_root):
+    pre_commit_hooks_path = repo_root / ".pre-commit-hooks.yaml"
+    hooks = yaml.safe_load(pre_commit_hooks_path.read_text())
+
+    hook_map = {h["id"]: h for h in hooks}
+    hook_spec = hook_map["generate-renovate-annotations"]
+    files_regex = hook_spec["files"]
+
+    assert files_regex == DEFAULT_FILES_REGEX_STRING
 
 
 @pytest.fixture()
