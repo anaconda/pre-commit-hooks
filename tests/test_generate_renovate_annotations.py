@@ -11,6 +11,7 @@ from anaconda_pre_commit_hooks.add_renovate_annotations import (
     Dependencies,
     Dependency,
     add_comments_to_env_file,
+    cli,
     load_dependencies,
     parse_pip_index_overrides,
     setup_conda_environment,
@@ -117,7 +118,7 @@ def mock_subprocess_run(monkeypatch):
     old_subprocess_run = subprocess.run
 
     def f(args, *posargs, **kwargs):
-        if args == ["make", "setup"]:
+        if args == ["make", "setup"] or args[:3] == ["conda", "env", "create"]:
             return subprocess.CompletedProcess(
                 args,
                 0,
@@ -215,3 +216,26 @@ def test_disable_environment_creation(mocker):
     mock = mocker.spy(add_renovate_annotations, "setup_conda_environment")
     load_dependencies(create_command=None)
     assert mock.call_count == 0
+
+
+def test_cli_disable_environment_creation(tmp_path, mocker):
+    env_file_path = tmp_path / "environment.yml"
+    with env_file_path.open("w") as fp:
+        fp.write(ENVIRONMENT_YAML)
+
+    mock = mocker.spy(add_renovate_annotations, "setup_conda_environment")
+    cli(env_files=[env_file_path], disable_environment_creation=True)
+    assert mock.call_count == 0
+
+
+def test_cli_override_create_command(tmp_path, mocker):
+    env_file_path = tmp_path / "environment.yml"
+    with env_file_path.open("w") as fp:
+        fp.write(ENVIRONMENT_YAML)
+
+    mock = mocker.spy(add_renovate_annotations, "setup_conda_environment")
+    create_command = "conda env create -n some-environment-name -f environment.yml"
+    cli(env_files=[env_file_path], create_command=create_command)
+    assert mock.call_count == 1
+    args, kwargs = mock.call_args
+    assert args[0] == create_command
