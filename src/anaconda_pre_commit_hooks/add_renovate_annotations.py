@@ -28,7 +28,7 @@ ChannelOverrides = dict[PackageName, ChannelName]
 IndexOverrides = dict[PackageName, IndexUrl]
 
 
-app = typer.Typer(add_completion=False)
+app = typer.Typer(rich_markup_mode="markdown", add_completion=False)
 
 
 class Dependency(TypedDict):
