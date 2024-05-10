@@ -28,6 +28,9 @@ ChannelOverrides = dict[PackageName, ChannelName]
 IndexOverrides = dict[PackageName, IndexUrl]
 
 
+app = typer.Typer(rich_markup_mode="markdown", add_completion=False)
+
+
 class Dependency(TypedDict):
     name: str
     channel: str
@@ -218,16 +221,62 @@ def parse_pip_index_overrides(
     return pip_index_overrides
 
 
+@app.callback(no_args_is_help=True)
 def cli(
-    env_files: list[Path],
-    internal_pip_package: Annotated[Optional[list[str]], typer.Option()] = None,
-    internal_pip_index_url: Annotated[str, typer.Option()] = "",
-    create_command: Annotated[str, typer.Option()] = DEFAULT_CREATE_COMMAND,
-    environment_selector: Annotated[str, typer.Option()] = DEFAULT_ENVIRONMENT_SELECTOR,
+    env_files: Annotated[
+        list[Path],
+        typer.Argument(
+            help="A list of conda environment files, typically passed in from pre-commit automatically"
+        ),
+    ],
+    internal_pip_package: Annotated[
+        Optional[list[str]],
+        typer.Option(
+            help="One or more packages to pull from the --internal-pip-index-url"
+        ),
+    ] = None,
+    internal_pip_index_url: Annotated[
+        str,
+        typer.Option(
+            help="An optional extra pip index URL, used in conjunction with the --internal-pip-package option"
+        ),
+    ] = "",
+    create_command: Annotated[
+        str,
+        typer.Option(
+            help="A command to invoke at each parent directory of all environment files to ensure the conda environment is created and updated"
+        ),
+    ] = DEFAULT_CREATE_COMMAND,
+    environment_selector: Annotated[
+        str,
+        typer.Option(
+            help="A string used to select the conda environment, either prefix-based (recommended) or named"
+        ),
+    ] = DEFAULT_ENVIRONMENT_SELECTOR,
     disable_environment_creation: Annotated[
-        bool, typer.Option("--disable-environment-creation")
+        bool,
+        typer.Option(
+            "--disable-environment-creation",
+            help="If set, environment will not be created/updated before annotations are added.",
+        ),
     ] = False,
 ) -> None:
+    """Generate Renovate comments for a list of `conda` environment files.
+
+    For each file, we:
+
+    * Run a command to ensure the environment is created/updated
+
+    * Extract a list of installed packages in that environment, including pip
+
+    * Generate a Renovate annotation comment, including the package name and channel.
+
+      This step also allows for overriding the index of pip packages.
+
+    * Pin the exact installed version of each dependency.
+
+    """
+
     # Construct a mapping of package name to index URL based on CLI options
     pip_index_overrides = parse_pip_index_overrides(
         internal_pip_index_url, internal_pip_package or []
@@ -247,7 +296,3 @@ def cli(
             add_comments_to_env_file(
                 env_file, deps, pip_index_overrides=pip_index_overrides
             )
-
-
-def main() -> None:
-    typer.run(cli)  # pragma: nocover
