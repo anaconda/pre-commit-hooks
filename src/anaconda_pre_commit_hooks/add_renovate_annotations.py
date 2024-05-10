@@ -232,10 +232,9 @@ def cli(
     # `make setup` for each file, and only once per project.
     project_dirs = sorted({env_file.parent for env_file in env_files})
     for project_dir in project_dirs:
-        create_command = create_command if not disable_environment_creation else None
         deps = load_dependencies(
             project_dir,
-            create_command=create_command,
+            create_command=create_command if not disable_environment_creation else None,
             environment_selector=environment_selector,
         )
         project_env_files = (e for e in env_files if e.parent == project_dir)
