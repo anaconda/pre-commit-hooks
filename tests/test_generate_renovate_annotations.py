@@ -1,4 +1,5 @@
 import json
+import re
 import subprocess
 from pathlib import Path
 from textwrap import dedent
@@ -13,6 +14,8 @@ from anaconda_pre_commit_hooks.add_renovate_annotations import (
     parse_pip_index_overrides,
     setup_conda_environment,
 )
+
+DEFAULT_FILES_REGEX_STRING = r"environment[\w-]*\.ya?ml"
 
 ENVIRONMENT_YAML = dedent("""\
     channels:
@@ -29,6 +32,40 @@ ENVIRONMENT_YAML = dedent("""\
       - -e .
     name: some-environment-name
 """)
+
+
+@pytest.fixture()
+def repo_root() -> Path:
+    return Path(__file__).parents[1]
+
+
+def test_ensure_default_files_regex_in_pre_commit_hooks_yaml_matches_tested(repo_root):
+    """This test ensures that the regex tested below is the same as what is in .pre-commit-hooks.yaml."""
+    pre_commit_hooks_path = repo_root / ".pre-commit-hooks.yaml"
+    hooks = yaml.safe_load(pre_commit_hooks_path.read_text())
+
+    hook_map = {h["id"]: h for h in hooks}
+    hook_spec = hook_map["generate-renovate-annotations"]
+    files_regex = hook_spec["files"]
+
+    assert files_regex == DEFAULT_FILES_REGEX_STRING
+
+
+@pytest.mark.parametrize(
+    "string, expected_match",
+    [
+        ("requirements.txt", False),
+        ("environment.yml", True),
+        ("environment-dev.yml", True),
+        ("environment.yaml", True),
+        ("environment-dev.yaml", True),
+        ("path/to/environment.yml", True),
+        ("infra/environments/base.yml", False),
+    ],
+)
+def test_default_files_regex(string, expected_match):
+    match = re.search(DEFAULT_FILES_REGEX_STRING, string)
+    assert bool(match) is expected_match
 
 
 @pytest.fixture()
