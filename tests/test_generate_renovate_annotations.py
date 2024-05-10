@@ -6,6 +6,7 @@ from textwrap import dedent
 
 import pytest
 import yaml
+from anaconda_pre_commit_hooks import add_renovate_annotations
 from anaconda_pre_commit_hooks.add_renovate_annotations import (
     Dependencies,
     Dependency,
@@ -14,6 +15,9 @@ from anaconda_pre_commit_hooks.add_renovate_annotations import (
     parse_pip_index_overrides,
     setup_conda_environment,
 )
+
+# Mock out subprocess run for all tests
+pytestmark = pytest.mark.usefixtures("mock_subprocess_run")
 
 DEFAULT_FILES_REGEX_STRING = r"environment[\w-]*\.ya?ml"
 
@@ -156,13 +160,11 @@ def mock_subprocess_run(monkeypatch):
     monkeypatch.setattr(subprocess, "run", f)
 
 
-@pytest.mark.usefixtures("mock_subprocess_run")
 def test_setup_conda_environment():
     result = setup_conda_environment("make setup")
     assert result is None
 
 
-@pytest.mark.usefixtures("mock_subprocess_run")
 def test_load_dependencies():
     dependencies = load_dependencies(Path.cwd())
     assert dependencies == Dependencies(
@@ -171,7 +173,6 @@ def test_load_dependencies():
     )
 
 
-@pytest.mark.usefixtures("mock_subprocess_run")
 def test_add_comments_to_env_file(tmp_path):
     env_file_path = tmp_path / "environment.yml"
     with env_file_path.open("w") as fp:
@@ -208,3 +209,9 @@ def test_add_comments_to_env_file(tmp_path):
           - -e .
         name: some-environment-name
     """)
+
+
+def test_disable_environment_creation(mocker):
+    mock = mocker.spy(add_renovate_annotations, "setup_conda_environment")
+    load_dependencies(create_command=None)
+    assert mock.call_count == 0
