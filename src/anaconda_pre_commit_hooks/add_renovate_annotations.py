@@ -219,7 +219,9 @@ def cli(
     internal_pip_index_url: Annotated[str, typer.Option()] = "",
     create_command: Annotated[str, typer.Option()] = DEFAULT_CREATE_COMMAND,
     environment_selector: Annotated[str, typer.Option()] = DEFAULT_ENVIRONMENT_SELECTOR,
-    disable_environment_creation: Annotated[bool, typer.Option()] = False,
+    disable_environment_creation: Annotated[
+        bool, typer.Option("--disable-environment-creation")
+    ] = False,
 ) -> None:
     # Construct a mapping of package name to index URL based on CLI options
     pip_index_overrides = parse_pip_index_overrides(

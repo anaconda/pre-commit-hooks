@@ -26,6 +26,9 @@ An example usage is shown below:
       --internal-pip-index-url=https://pypi.anaconda.org/my-organization/simple,
       --internal-pip-package=my-private-package,
       --internal-pip-package=my-other-private-package,
+      --create-command="make setup",     # Default value
+      --environment-selector="-p ./env", # Default value
+      --disable-environment-creation     # Creation enabled by default
     ]
 ```
 
