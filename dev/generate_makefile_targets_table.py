@@ -42,10 +42,5 @@ def main():
 
 if __name__ == "__main__":
     # If we run this file as a script, we just make `cog.outl` emit print statements for debugging purposes.
-
-    class DummyCog:
-        def outl(self, text: str) -> None:
-            print(text)
-
-    # cog = DummyCog()
+    cog.outl = print
     main()
