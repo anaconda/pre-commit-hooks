@@ -14,5 +14,6 @@ dependencies:
 # renovate: datasource=conda depName=main/pytest-cov
 - pytest-cov=4.1.0
 - pip:
-  - cog
+  # renovate: datasource=pypi
+  - cog==0.9.7
   - -e .
