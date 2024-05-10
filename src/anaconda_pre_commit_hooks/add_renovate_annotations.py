@@ -16,6 +16,9 @@ from typing import Annotated, NamedTuple, Optional, TypedDict
 
 import typer
 
+DEFAULT_ENVIRONMENT_SELECTOR = "-p ./env"
+DEFAULT_CREATE_COMMAND = "make setup"
+
 CondaOrPip = str
 PackageName = str
 PackageVersion = str
@@ -66,8 +69,8 @@ def list_packages_in_conda_environment(environment_selector: str) -> list[dict]:
 
 def load_dependencies(
     project_directory: Optional[Path] = None,
-    create_command: str = "make setup",
-    environment_selector: str = "-p ./env",
+    create_command: Optional[str] = DEFAULT_CREATE_COMMAND,
+    environment_selector: str = DEFAULT_ENVIRONMENT_SELECTOR,
 ) -> Dependencies:
     """Load the dependencies from a live conda environment.
 
@@ -80,7 +83,8 @@ def load_dependencies(
         An object containing all dependencies in the installed environment, split between conda and pip packages.
 
     """
-    setup_conda_environment(create_command, cwd=project_directory or Path.cwd())
+    if create_command is not None:
+        setup_conda_environment(create_command, cwd=project_directory or Path.cwd())
 
     data = list_packages_in_conda_environment(environment_selector)
 
@@ -213,6 +217,11 @@ def cli(
     env_files: list[Path],
     internal_pip_package: Annotated[Optional[list[str]], typer.Option()] = None,
     internal_pip_index_url: Annotated[str, typer.Option()] = "",
+    create_command: Annotated[str, typer.Option()] = DEFAULT_CREATE_COMMAND,
+    environment_selector: Annotated[str, typer.Option()] = DEFAULT_ENVIRONMENT_SELECTOR,
+    disable_environment_creation: Annotated[
+        bool, typer.Option("--disable-environment-creation")
+    ] = False,
 ) -> None:
     # Construct a mapping of package name to index URL based on CLI options
     pip_index_overrides = parse_pip_index_overrides(
@@ -223,7 +232,11 @@ def cli(
     # `make setup` for each file, and only once per project.
     project_dirs = sorted({env_file.parent for env_file in env_files})
     for project_dir in project_dirs:
-        deps = load_dependencies(project_dir)
+        deps = load_dependencies(
+            project_dir,
+            create_command=create_command if not disable_environment_creation else None,
+            environment_selector=environment_selector,
+        )
         project_env_files = (e for e in env_files if e.parent == project_dir)
         for env_file in project_env_files:
             add_comments_to_env_file(
