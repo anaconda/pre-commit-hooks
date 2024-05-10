@@ -1,3 +1,4 @@
+import re
 import subprocess
 from textwrap import dedent
 from typing import NamedTuple
@@ -34,6 +35,10 @@ def main():
         f"|{'-'*(max_target_len + 2)}|{'-'*(max_description_len + 2):{max_description_len}s}|"
     )
     for t in makefile_targets:
+        # In GitHub Actions, we get superfluous targets like `make[1]`, so ignore those
+        if re.search(r"make\[[0-9]+]", t.target):
+            continue
+
         target_str = f"`{t.target}`"
         cog.outl(
             f"| {target_str:{max_target_len}s} | {t.description:{max_description_len}s} |"

@@ -34,4 +34,7 @@ type-check:  ## Run static type checks
 test:  ## Run all the unit tests
 	$(conda_run) pytest
 
+cog-readme:  ## Run cog on the README.md to generate command output
+	$(conda_run) run-cog README.md
+
 .PHONY: $(MAKECMDGOALS)
