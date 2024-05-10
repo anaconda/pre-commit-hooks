@@ -1,11 +1,17 @@
 channels:
 - defaults
 dependencies:
-- python=3.10
-- pytest
-- pytest-cov
-- pyyaml
-- pip
-- mypy
+# renovate: datasource=conda depName=main/python
+- python=3.10.14
+# renovate: datasource=conda depName=main/pip
+- pip=24.0
+# renovate: datasource=conda depName=main/pyyaml
+- pyyaml=6.0.1
+# renovate: datasource=conda depName=main/mypy
+- mypy=1.8.0
+# renovate: datasource=conda depName=main/pytest
+- pytest=7.4.0
+# renovate: datasource=conda depName=main/pytest-cov
+- pytest-cov=4.1.0
 - pip:
   - -e .
