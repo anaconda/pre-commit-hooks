@@ -43,14 +43,14 @@ main(command="generate-renovate-annotations --help")
 [1m                                                                                [0m
 [1m [0m[1;33mUsage: [0m[1mgenerate-renovate-annotations [OPTIONS] ENV_FILES... COMMAND [ARGS]...[0m[1m [0m[1m [0m
 [1m                                                                                [0m
- Generate Renovate comments for a list of [1;36;40mconda[0m environment files.
+ Generate Renovate comments for a list of `conda` environment files.
  [2mFor each file, we:[0m
-
- [1;33m • [0m[2mRun a command to ensure the environment is created/updated[0m[2m                 [0m
- [1;33m • [0m[2mExtract a list of installed packages in that environment, including pip[0m[2m    [0m
- [1;33m • [0m[2mGenerate a Renovate annotation comment, including the package name and [0m[2m    [0m
- [1;33m   [0m[2mchannel.[0m[2m [0m[2mThis step also allows for overriding the index of pip packages.[0m[2m   [0m
- [1;33m • [0m[2mPin the exact installed version of each dependency.[0m[2m                        [0m
+ [2m* Run a command to ensure the environment is created/updated[0m
+ [2m* Extract a list of installed packages in that environment, including pip[0m
+ [2m* Generate a Renovate annotation comment, including the package name and [0m
+ [2mchannel.[0m
+ [2mThis step also allows for overriding the index of pip packages.[0m
+ [2m* Pin the exact installed version of each dependency.[0m
 
 [2m╭─[0m[2m Arguments [0m[2m─────────────────────────────────────────────────────────────────[0m[2m─╮[0m
 [2m│[0m [31m*[0m    env_files      [1;33mENV_FILES...[0m  A list of conda environment files,         [2m│[0m
@@ -62,11 +62,11 @@ main(command="generate-renovate-annotations --help")
 [2m╭─[0m[2m Options [0m[2m───────────────────────────────────────────────────────────────────[0m[2m─╮[0m
 [2m│[0m [1;36m-[0m[1;36m-internal[0m[1;36m-pip-package[0m                [1;33mTEXT[0m  One or more packages to pull     [2m│[0m
 [2m│[0m                                             from the                         [2m│[0m
-[2m│[0m                                             --internal-pip-index-url         [2m│[0m
+[2m│[0m                                             [1;36m-[0m[1;36m-internal[0m[1;36m-pip-index-url[0m         [2m│[0m
 [2m│[0m                                             [2m[default: None]                 [0m [2m│[0m
 [2m│[0m [1;36m-[0m[1;36m-internal[0m[1;36m-pip-index-url[0m              [1;33mTEXT[0m  An optional extra pip index URL, [2m│[0m
 [2m│[0m                                             used in conjunction with the     [2m│[0m
-[2m│[0m                                             --internal-pip-package option    [2m│[0m
+[2m│[0m                                             [1;36m-[0m[1;36m-internal[0m[1;36m-pip-package[0m option    [2m│[0m
 [2m│[0m [1;36m-[0m[1;36m-create[0m[1;36m-command[0m                      [1;33mTEXT[0m  A command to invoke at each      [2m│[0m
 [2m│[0m                                             parent directory of all          [2m│[0m
 [2m│[0m                                             environment files to ensure the  [2m│[0m
