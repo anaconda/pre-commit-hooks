@@ -15,6 +15,6 @@
   name: generate-renovate-annotations
   description: Generate Renovate tags in environment.yml files
   entry: generate-renovate-annotations
-  files: environment.*\.ya?ml
+  files: environment[\w-]*\.ya?ml
   args: []
   language: python
