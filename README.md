@@ -32,6 +32,30 @@ An example usage is shown below:
     ]
 ```
 
+The hook is backed by a CLI command, whose help output is reproduced below:
+
+<!-- [[[cog
+import os, sys; sys.path.insert(0, os.path.join(os.getcwd(), "dev"))
+from generate_cli_output import main
+main(command="generate-renovate-annotations --help")
+]]] -->
+```shell
+Usage: generate-renovate-annotations [OPTIONS] ENV_FILES...
+
+╭─ Arguments ──────────────────────────────────────────────────────────────────╮
+│ *    env_files      ENV_FILES...  [default: None] [required]                 │
+╰──────────────────────────────────────────────────────────────────────────────╯
+╭─ Options ────────────────────────────────────────────────────────────────────╮
+│ --internal-pip-package                TEXT  [default: None]                  │
+│ --internal-pip-index-url              TEXT                                   │
+│ --create-command                      TEXT  [default: make setup]            │
+│ --environment-selector                TEXT  [default: -p ./env]              │
+│ --disable-environment-creation                                               │
+│ --help                                      Show this message and exit.      │
+╰──────────────────────────────────────────────────────────────────────────────╯
+```
+<!-- [[[end]]] -->
+
 ## run-cog
 
 The `run-cog` hook can be used to run the [`cog`](https://nedbatchelder.com/code/cog) tool automatically to generate code when committing a file.
