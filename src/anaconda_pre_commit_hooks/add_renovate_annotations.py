@@ -221,7 +221,7 @@ def parse_pip_index_overrides(
     return pip_index_overrides
 
 
-@app.callback(no_args_is_help=True)
+@app.callback(invoke_without_command=True, no_args_is_help=True)
 def cli(
     env_files: Annotated[
         list[Path],
