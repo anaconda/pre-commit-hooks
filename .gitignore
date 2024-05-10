@@ -7,5 +7,5 @@ __pycache__/
 env/
 
 # Test coverage output
-/.coverage
-/coverage.xml
+.coverage
+coverage.xml
