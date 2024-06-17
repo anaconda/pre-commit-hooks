@@ -10,7 +10,7 @@ dependencies:
 # renovate: datasource=conda depName=main/mypy
 - mypy=1.8.0
 # renovate: datasource=conda depName=main/pytest
-- pytest=7.4.0
+- pytest=7.4.4
 # renovate: datasource=conda depName=main/pytest-cov
 - pytest-cov=4.1.0
 # renovate: datasource=conda depName=main/pytest-mock
