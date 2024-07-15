@@ -13,7 +13,7 @@ repos:
     files: README.md|Makefile
   - id: generate-renovate-annotations
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-  rev: v2.13.0
+  rev: v2.14.0
   hooks:
   - id: pretty-format-toml
     args: [--autofix]
