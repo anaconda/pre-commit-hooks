@@ -6,6 +6,7 @@ from textwrap import dedent
 
 import pytest
 import yaml
+
 from anaconda_pre_commit_hooks import add_renovate_annotations
 from anaconda_pre_commit_hooks.add_renovate_annotations import (
     Dependencies,
