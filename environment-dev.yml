@@ -4,7 +4,7 @@ dependencies:
 # renovate: datasource=conda depName=main/python
 - python=3.12.3
 # renovate: datasource=conda depName=main/pip
-- pip=24.0
+- pip=24.2
 # renovate: datasource=conda depName=main/pyyaml
 - pyyaml=6.0.1
 # renovate: datasource=conda depName=main/mypy
