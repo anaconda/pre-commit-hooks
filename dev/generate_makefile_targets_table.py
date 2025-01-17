@@ -32,7 +32,7 @@ def main():
         f"| {'Target':{max_target_len}s} | {'Description':{max_description_len}s} |"
     )
     cog.outl(
-        f"|{'-'*(max_target_len + 2)}|{'-'*(max_description_len + 2):{max_description_len}s}|"
+        f"|{'-' * (max_target_len + 2)}|{'-' * (max_description_len + 2):{max_description_len}s}|"
     )
     for t in makefile_targets:
         # In GitHub Actions, we get superfluous targets like `make[1]`, so ignore those
