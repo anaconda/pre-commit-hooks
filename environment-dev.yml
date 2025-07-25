@@ -2,7 +2,7 @@ channels:
 - defaults
 dependencies:
 # renovate: datasource=conda depName=main/python
-- python=3.13.2
+- python=3.13.5
 # renovate: datasource=conda depName=main/pip
 - pip=25.1
 # renovate: datasource=conda depName=main/pyyaml
