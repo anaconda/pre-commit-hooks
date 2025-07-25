@@ -17,5 +17,5 @@ dependencies:
 - pytest-mock=3.14.0
 - pip:
   # renovate: datasource=pypi
-  - cogapp==3.4.1
+  - cogapp==3.5.1
   - -e .
