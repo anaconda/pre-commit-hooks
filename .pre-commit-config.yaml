@@ -7,7 +7,7 @@ repos:
   - id: check-json
   - id: check-yaml
 - repo: https://github.com/anaconda/pre-commit-hooks
-  rev: v24.5.2
+  rev: debug/generate-renovate-annotations
   hooks:
   - id: cog
     files: README.md|Makefile
