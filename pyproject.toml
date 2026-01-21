@@ -7,7 +7,7 @@ authors = [
   {name = "Matt Kramer", email = "mkramer@anaconda.com"}
 ]
 dependencies = [
-  "cogapp<=3.5.1",
+  "cogapp<=3.6.0",
   "typer<0.17"
 ]
 description = "Python pre-commit hooks from Anaconda"
