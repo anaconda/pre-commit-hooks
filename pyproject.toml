@@ -8,7 +8,7 @@ authors = [
 ]
 dependencies = [
   "cogapp<=3.6.0",
-  "typer<0.17"
+  "typer<0.22"
 ]
 description = "Python pre-commit hooks from Anaconda"
 license = {text = "Apache-2.0"}
