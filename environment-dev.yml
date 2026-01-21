@@ -6,7 +6,7 @@ dependencies:
 # renovate: datasource=conda depName=main/pip
 - pip=25.3
 # renovate: datasource=conda depName=main/pyyaml
-- pyyaml=6.0.2
+- pyyaml=6.0.3
 # renovate: datasource=conda depName=main/mypy
 - mypy=1.17.1
 # renovate: datasource=conda depName=main/pytest
