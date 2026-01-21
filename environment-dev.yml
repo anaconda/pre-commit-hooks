@@ -14,7 +14,7 @@ dependencies:
 # renovate: datasource=conda depName=main/pytest-cov
 - pytest-cov=6.0.0
 # renovate: datasource=conda depName=main/pytest-mock
-- pytest-mock=3.14.0
+- pytest-mock=3.15.1
 - pip:
   # renovate: datasource=pypi
   - cogapp==3.5.1
