@@ -44,7 +44,7 @@ jobs:
     - name: Report coverage
       id: coverage
       if: ${{ !cancelled() }}
-      uses: MishaKav/pytest-coverage-comment@46a1348587126fb199084ee9024ce511cb3abbdb # v1.4.0
+      uses: MishaKav/pytest-coverage-comment@432ac90e8d345c93e1d90ee0838b35913abc9c9b # v1.12.2
       with:
         title: Coverage Report
         pytest-xml-coverage-path: ./coverage.xml
