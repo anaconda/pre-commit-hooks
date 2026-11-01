@@ -4,14 +4,14 @@ requires = ["setuptools", "setuptools-scm"]
 
 [project]
 authors = [
-  {name = "Matt Kramer", email = "mkramer@anaconda.com"}
+  { name = "Matt Kramer", email = "mkramer@anaconda.com" }
 ]
 dependencies = [
   "cogapp<=3.6.0",
   "typer<0.25"
 ]
 description = "Python pre-commit hooks from Anaconda"
-license = {text = "Apache-2.0"}
+license = { text = "Apache-2.0" }
 name = "anaconda_pre_commit_hooks"
 readme = "README.md"
 requires-python = ">=3.8"
